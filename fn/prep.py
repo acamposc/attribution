@@ -98,7 +98,7 @@ def query_data(today):
         SELECT
         *
         FROM
-        `{}`
+        {}
     """.format(raw_data_table_id)
 
     dataframe = (

@@ -1,14 +1,15 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
-from fn import attribution, prep, proc
+import numpy as np
+from fn import attribution, prep, proc, test
 
 
 '''
 Bring data from Bigquery
 '''
 dataframe = prep.query_data(today = datetime.now().date())
-test(data = dataframe)
+
 '''
 data = pd.read_csv("/home/arturplur/projects/scotiabank/out/app/df_values1.csv")
 
@@ -86,3 +87,81 @@ dataframes = [
 
 upload = prep.upload_to_bigquery(dataframes = dataframes)
 '''
+
+
+'''
+Variable init
+'''
+dataframe_list = []
+success_events = []
+
+def test(data):
+    data_g = data.groupby(['event_name'])
+    dataframe = pd.DataFrame(data_g)        
+    '''
+    Takes dataframe in and splits it into multiple dataframes
+    
+    data_groupedby_eventname = dataframe.groupby('event_name')
+    dataframe = pd.DataFrame(data_groupedby_eventname)
+    '''
+    #list groups within dataframe
+    data_names = [x for x in dataframe[0]]
+    #print(data_names)
+
+    #Keeping rows that match the business rules.
+    data_sets = []
+    for name in data_names:
+            data_sets.append(data_g.get_group(name))
+
+    #print(data_sets)
+
+    frames = []
+    #print(data_sets[0])
+    #create multiple dataframes 
+    for i in range(len(data_sets)):
+            frames.append(pd.DataFrame(data_sets[i]))
+
+    #cantidad de dataframes con success events
+    #print(frames)
+
+    mdls = []
+    #antes de enviar a modelo hay que eliminar columnas.
+    for frame in frames:
+            #for earch frame keep columns path, conversions
+            mdls.append(frame[['path','conversions']])
+            
+    #print(len(mdls))
+
+    
+    #apply attribution model to dataframes.
+    attris = []
+    for mdl in mdls:
+            attris.append(
+                    attribution.markov(mdl)
+            )
+
+    #success events as column values.
+    mdl_results = []
+    for attri, name in zip(attris, data_names):
+            #print(len(attri), name)
+            for at in attri:
+                    at['success_event'] = name
+                    mdl_results.append(at)
+
+    #print(mdl_results)
+
+    #split channel and platform from channel_name
+    for mdl in mdl_results:
+            if mdl.columns.values[0] == 'channel_name':
+                new_col = mdl['channel_name'].str.split(' - ', n = 1, expand = True)
+                mdl['path'] = new_col[0]
+                mdl['platform'] = new_col[1]
+                mdl['upload_date'] = datetime.now().date().strftime("%Y-%m-%d")
+                mdl['upload_timestamp'] = datetime.now().timestamp() 
+            else:
+                    pass
+            
+    print(mdl_results)
+    print(len(mdl_results))
+
+test(data = dataframe)

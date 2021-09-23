@@ -10,7 +10,7 @@ Processing dataframe
 import os
 import pandas as pd
 import numpy as np
-import attribution
+#import attribution
 from datetime import datetime, timedelta
 
 
@@ -20,11 +20,12 @@ Variable init
 dataframe_list = []
 success_events = []
 
-def test():
+def test(data):
     '''
-    Lee el excel '''
+    Lee el excel 
     data = pd.read_csv("/home/arturplur/projects/scotiabank/out/app/df_values1.csv")
-   
+    '''
+
     data_g = data.groupby(['event_name'])
     dataframe = pd.DataFrame(data_g)        
     '''
@@ -66,7 +67,7 @@ def test():
     attris = []
     for mdl in mdls:
             attris.append(
-                    attribution.markov(mdl)
+                    fn.attribution.markov(mdl)
             )
 
     #success events as column values.
@@ -157,5 +158,3 @@ def test():
     mdls_v = pd.DataFrame.from_dict(mdls_r, orient = "index")
 
     print(mdls_l)'''
-
-test()
