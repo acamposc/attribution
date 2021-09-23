@@ -1,0 +1,9 @@
+keys.json
+env.sh
+out/app*
+*terraform.tfvars*
+**/terraform*
+**tfplan*
+**main.tf*
+**.lock*
+**.tf*
