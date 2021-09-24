@@ -53,6 +53,12 @@ def markov(data):
     mma_removal_effects = mm.removal_effects_
     #mma_removal_effects.to_csv("mma_removal_effects", index = False)
 
+    mma_total_conversions.name = 'mma_total_conversions'
+    mma_transition_matrix.name = 'mma_transition_matrix'
+    mma_removal_effects.name = 'mma_removal_effects'
+    #mma_first_touch.name = 'mma_first_touch'
+    #mma_last_touch.name = 'mma_last_touch'
+
     return [
             mma_total_conversions,
             mma_transition_matrix,

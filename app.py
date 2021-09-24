@@ -107,6 +107,10 @@ def test(data):
     #list groups within dataframe
     data_names = [x for x in dataframe[0]]
     #print(data_names)
+    
+    #data_process_names = [x for x in dataframe[1]]
+    #print(data_process_names)
+    
 
     #Keeping rows that match the business rules.
     data_sets = []
@@ -159,9 +163,21 @@ def test(data):
                 mdl['upload_date'] = datetime.now().date().strftime("%Y-%m-%d")
                 mdl['upload_timestamp'] = datetime.now().timestamp() 
             else:
-                    pass
-            
-    print(mdl_results)
+                    if mdl.columns.values[0] == 'channel_from':
+                        mdl['upload_date'] = datetime.now().date().strftime("%Y-%m-%d")
+                        mdl['upload_timestamp'] = datetime.now().timestamp() 
+                    
+                    else: pass                       
+    
+    '''
+    Upload data to bigquery
+    '''
+    
+    #prep.upload_to_bigquery(dataframes = mdl_results)
+    
+
+
+    #print(mdl_results)
     print(len(mdl_results))
 
 test(data = dataframe)

@@ -67,7 +67,7 @@ def test(data):
     attris = []
     for mdl in mdls:
             attris.append(
-                    fn.attribution.markov(mdl)
+                    attribution.markov(mdl)
             )
 
     #success events as column values.

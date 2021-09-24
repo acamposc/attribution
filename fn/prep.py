@@ -17,9 +17,11 @@ Write results to Bigquery table
 
 def upload_to_bigquery(dataframes):
     '''Write files to csv'''
-    for dataframe in dataframes:
-        dataframe.to_csv("{}.csv".format(dataframe.name), index = False)
-
+    for index, dataframe in enumerate(dataframes):
+        unique_name = dataframe.name + "_" + str(index)
+        #print(unique_name)
+        dataframe.to_csv("{}.csv".format(unique_name), index = False)
+    
     '''Authenticate a service account'''
     key_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
     storage_client = storage.Client.from_service_account_json(key_path)
@@ -31,8 +33,10 @@ def upload_to_bigquery(dataframes):
     And build the file uris in Cloud Storage.
     '''
     file_uris = []
-    for dataframe in dataframes:
-        destination_blob_name = "{}.csv".format(dataframe.name)
+    for index, dataframe in enumerate(dataframes):
+        unique_name = dataframe.name + "_" + str(index)
+
+        destination_blob_name = "{}.csv".format(unique_name)
         source_file_name = destination_blob_name
         bucket = storage_client.bucket(buckets[0].name)
         blob = bucket.blob(destination_blob_name)
@@ -60,7 +64,7 @@ def upload_to_bigquery(dataframes):
 
     '''Bigquery settings for load jobs.'''
     job_config = bigquery.LoadJobConfig(
-        source_format=bigquery.SourceFormat.CSV, skip_leading_rows=1)
+        source_format=bigquery.SourceFormat.CSV, skip_leading_rows=1,write_disposition='WRITE_APPEND')
 
     '''Load data from Cloud Storage to Bigquery.'''
     table_ids = table_ids
